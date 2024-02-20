@@ -1,0 +1,6 @@
+.idea
+croxy
+.vscode
+deps/llhttp/lib
+deps/llhttp/build
+deps/llhttp/node_modules
