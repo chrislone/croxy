@@ -1,4 +1,5 @@
 .idea
+cert
 croxy
 .vscode
 deps/llhttp/lib
