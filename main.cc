@@ -108,10 +108,7 @@ SSL_CTX* create_context()
     const SSL_METHOD *method;
     SSL_CTX *ctx;
 
-//    if (isServer)
-        method = TLS_server_method();
-//    else
-//        method = TLS_client_method();
+    method = TLS_server_method();
 
     ctx = SSL_CTX_new(method);
     if (ctx == NULL) {

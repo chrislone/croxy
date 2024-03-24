@@ -3,8 +3,8 @@ DEST = out/openssl
 OPENSSLDEST = $(abspath $(lastword $(DEST)))
 # .DEFAULT_GOAL := croxy
 
-croxy: main.cc openssl openssl_sw_install
-	$(GPP) -static -std=c++11 $< -o $@ -I./out -L./out/llhttp -lllhttp -I./out/openssl/include -L./out/openssl/lib64 -lssl -lcrypto
+croxy: main.cc llhttp openssl openssl_sw_install
+	$(GPP) -static -std=c++11 $< -o $@ -I./out -L./out/llhttp/build -lllhttp -I./out/openssl/include -L./out/openssl/lib64 -lssl -lcrypto
 
 clean:
 	rm -rf croxy && rm -rf out/*
@@ -17,9 +17,6 @@ openssl:
 	cd deps/openssl && ./Configure --prefix=$(OPENSSLDEST)
 
 openssl_sw_install: openssl
-	cd deps/openssl && make -j10 build_sw && make -j10 install_sw
-
-echo_job:
-	echo $(JOBS)
+	cd deps/openssl && make -j15 build_sw && make -j15 install_sw
 
 .PHONY: clean

@@ -107,7 +107,7 @@ public:
     SSL_CTX *forwardCtx;
     SSL *forwardSsl;
     int forwardSocketFd = -1;
-    void retResponse();
+//    void retResponse();
     void retConnectResponse();
     void getForwardHostAndPort();
     void configForwardCtx();
@@ -373,26 +373,6 @@ string ChildProcess::getForwardDottedIp() {
     return "";
 }
 
-void ChildProcess::retResponse() {
-    string content = "i love the world\n";
-
-    string returnStr = "HTTP/1.1 200 OK\r\n";
-    returnStr += "Server: bfe/1.0.8.18\r\n";
-    returnStr += "Date: Fri, 09 Feb 2024 15:10:13 GMT\r\n";
-    returnStr += "Content-Type: text/html\r\n";
-    returnStr += "Content-Length: ";
-    returnStr += to_string(content.size());
-    returnStr += "\r\n";
-    returnStr += "Connection: keep-alive\r\n";
-    returnStr += "\r\n";
-    returnStr += content;
-
-    /* Response it back */
-    if (SSL_write(this->ssl, returnStr.c_str(), returnStr.size()) <= 0) {
-        ERR_print_errors_fp(stderr);
-    }
-}
-
 void ChildProcess::retConnectResponse() {
     string returnStr = "HTTP/1.1 200 Connection established\r\n";
     returnStr += "Proxy-Agent: croxy/0.0.1\r\n";
@@ -463,7 +443,6 @@ void handle_child_process(SSL_CTX *ssl_ctx, int client_skt) {
             if (err == HPE_OK) {
                 /* Successfully parsed! */
                 cout << "Successfully parsed!" << endl;
-                childItem.retResponse();
             } else {
                 fprintf(stderr, "Parse error: %s %s\n", llhttp_errno_name(err), childItem.parser.reason);
                 if(childItem.parser.method == HTTP_CONNECT) {
@@ -489,122 +468,3 @@ void handle_child_process(SSL_CTX *ssl_ctx, int client_skt) {
         exit(0);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    /*
-//     * By doing this when a new connection is established
-//     * we automatically have sbio inserted into it. The
-//     * BIO chain is now 'swallowed' by the accept BIO and
-//     * will be freed when the accept BIO is freed.
-//     */
-//    out = BIO_new_fp(stdout, BIO_NOCLOSE);
-//
-//    if (BIO_do_handshake(bio_ssl) <= 0) {
-//        fprintf(stderr, "Error in SSL handshake\n");
-//        ERR_print_errors_fp(stderr);
-//        exit(1);
-//    }
-//
-//    childItem.settingParse();
-//
-//    int fd;
-//    BIO_get_fd(bio_ssl, &fd);
-//    printf("bio_ssl fd %d\n", fd);
-////    printf("acpt_fd fd %d\n", acpt_fd);
-//
-//    for (;;) {
-//        if(isComplete == 1) {
-//            puts("break by isComplete");
-//            break;
-//        }
-//        int accept_len = BIO_gets(bio_ssl, tmpbuf, BUF_LEN);
-//        childItem.acceptHttpStr += tmpbuf;
-////        printf("accept_len %d\n", accept_len);
-//        if(accept_len <= 0) {
-//            break;
-//        }
-//        enum llhttp_errno err = llhttp_execute(&(childItem.parser), tmpbuf, accept_len);
-//        if (err == HPE_OK) {
-//            /* Successfully parsed! */
-////            cout << "llhttp_errno err: " << err << endl;
-//        } else {
-//            fprintf(stderr, "Parse error: %s %s\n", llhttp_errno_name(err), childItem.parser.reason);
-//            break;
-//        }
-////        childItem.doParse();
-////        printf("tmpbuf: %s\n", tmpbuf);
-////        printf("tmpbuf length: %ld\n", strlen(tmpbuf));
-//    }
-//
-////    enum llhttp_errno err = llhttp_execute(&(childItem.parser), childItem.acceptHttpStr.c_str(), childItem.acceptHttpStr.size());
-//////        printf("llhttp_errno err : %d\n", err);
-//////        puts("3");
-////    if (err == HPE_OK) {
-////        /* Successfully parsed! */
-////        cout << "llhttp_errno err: " << err << endl;
-////    } else {
-////        fprintf(stderr, "Parse error: %s %s\n", llhttp_errno_name(err), childItem.parser.reason);
-////    }
-//
-//    cout << "childItem.acceptHttpStr: " << childItem.acceptHttpStr << endl;
-//
-//    BIO_puts(bio_ssl, "HTTP/1.0 200 OK\r\nContent-type: text/plain\r\n\r\n");
-//    BIO_puts(bio_ssl, "\r\nConnection Established\r\nRequest headers:\r\n");
-//    BIO_puts(bio_ssl, "--------------------------------------------------\r\n");
-//
-//    BIO_write(bio_ssl, childItem.acceptHttpStr.c_str(), childItem.acceptHttpStr.size());
-//
-////    for (;;) {
-////        len = BIO_gets(bio_ssl, tmpbuf, 1024);
-////        if (len <= 0)
-////            break;
-////        BIO_write(bio_ssl, tmpbuf, len);
-////        BIO_write(out, tmpbuf, len);
-////        /* Look for blank line signifying end of headers*/
-////        if (tmpbuf[0] == '\r' || tmpbuf[0] == '\n')
-////            break;
-////    }
-//
-//    BIO_puts(bio_ssl, "\n");
-//    BIO_puts(bio_ssl, "--------------------------------------------------\r\n");
-//    BIO_puts(bio_ssl, "\r\n");
-////                puts("before flush");
-//    BIO_flush(bio_ssl);
-////                puts("after flush");
-//    BIO_free_all(bio_ssl);
-////                puts("after BIO_free_all");
-//    BIO_free(out);
-    // child process exit
-//    exit(0);
-//}
-
-//int on_url_handler(llhttp_t* parser, const char* at, size_t length)
-//{
-//    char substr[length + 1];
-//    // 将子字符串复制到新的字符串中
-//    strncpy(substr, at, length);
-//    substr[length] = '\0';  // 添加字符串结束符
-//    printf("on_url_handler: %s\n", substr);
-//    return 0;
-//}
-//
-//int on_body_handler(llhttp_t *parser, const char *at, size_t length) {
-//    char substr[length + 1];
-//    strncpy(substr, at, length);
-//    substr[length] = '\0';  // 添加字符串结束符
-//    printf("on_body_handler: %s\n", substr);
-//    return 0;
-//}
